@@ -3,12 +3,12 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2>Gestión de Libros</h2>
       <div>
-        <button @click="obtenerLibros" class="btn btn-primary me-2" :disabled="isLoading">
-          <i class="fas fa-sync-alt" :class="{'fa-spin': isLoading}"></i>
-          <span v-if="isLoading">Cargando...</span>
+        <button @click="fetchLibros" class="btn btn-primary me-2" :disabled="isLoading">
+          <i class="fas fa-sync-alt" :class="{ 'fa-spin': isLoading }"></i>
+          <span v-if="isLoading">Cargando</span>
           <span v-else>Actualizar</span>
         </button>
-        <router-link to="/libros/crear" class="btn btn-success">
+        <router-link to="/books/create" class="btn btn-success">
           <i class="fas fa-plus"></i> Nuevo Libro
         </router-link>
       </div>
@@ -16,7 +16,7 @@
 
     <div v-if="isLoading" class="text-center my-5">
       <div class="spinner-border" role="status">
-        <span class="visually-hidden">Cargando...</span>
+        <span class="visually-hidden">Cargando</span>
       </div>
       <p class="mt-2">Cargando libros...</p>
     </div>
@@ -28,7 +28,7 @@
             <th>ID</th>
             <th>Título</th>
             <th>Sinopsis</th>
-            <th>Autor</th>
+            <th>Autor ID</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -36,24 +36,20 @@
           <tr v-if="libros.length === 0 && !isLoading">
             <td colspan="5" class="text-center">
               <div class="alert alert-info m-0 border-0">
-                No hay libros disponibles. Crea un nuevo libro para comenzar.
+                No hay libros disponibles
               </div>
             </td>
           </tr>
-          <tr v-for="libro in libros" :key="libro.id" v-else>
+          <tr v-for="libro in libros" :key="libro.id">
             <td>{{ libro.id }}</td>
             <td>{{ libro.titulo }}</td>
-            <td>
-              <div class="sinopsis-container">
-                {{ truncarTexto(libro.sinopsis, 100) }}
-              </div>
-            </td>
-            <td>{{ obtenerNombreAutor(libro.autor_id) }}</td>
+            <td class="sinopsis-container">{{ libro.sinopsis }}</td>
+            <td>{{ libro.autor_id }}</td>
             <td>
               <div class="btn-group">
-                <button @click="editarLibro(libro.id)" class="btn btn-sm btn-warning me-2">
+                <router-link :to="{ name: 'BooksEdit', params: { id: libro.id } }" class="btn btn-sm btn-warning me-2">
                   <i class="fas fa-edit"></i> Editar
-                </button>
+                </router-link>
                 <button @click="eliminarLibro(libro.id)" class="btn btn-sm btn-danger">
                   <i class="fas fa-trash"></i> Eliminar
                 </button>
@@ -70,79 +66,41 @@
   </div>
 </template>
 
-<script> //error lo tengo aqui
-import axios from 'axios'
+<script setup>
+import { ref, onMounted } from 'vue';
+import api from '@/configApi/Axios.js';
 
-export default {
-  name: 'MostrarLibros',
-  data() {
-    return {
-      libros: [], 
-      autores: [],
-      isLoading: false,
-      error: null
-    }
-  },
-  mounted() {
-    this.obtenerLibros()
-    this.obtenerAutores()
-  },
-  methods: {
-    async obtenerLibros() {
-      this.isLoading = true
-      this.error = null
-      
-      try {
-        const response = await axios.get('/api/libros')
-        this.libros = Array.isArray(response.data) ? response.data.filter(libro => libro && libro.id) : []
-        console.log(`Cargados ${this.libros.length} libros de la base de datos`)
-      } catch (error) {
-        console.error('Error al obtener los libros:', error)
-        this.error = 'No se pudieron cargar los libros. Por favor, intenta de nuevo más tarde.'
-      } finally {
-        this.isLoading = false
-      }
-    },
+const libros = ref([]);
+const isLoading = ref(false);
+const error = ref('');
 
-    async obtenerAutores() {
-      try {
-        const response = await axios.get('/api/Autores')
-        this.autores = Array.isArray(response.data) ? response.data : []
-      } catch (error) {
-        console.error('Error al obtener los autores:', error)
-      }
-    },
+const fetchLibros = async () => {
+  isLoading.value = true;
+  error.value = '';
+  try {
+    const resp = await api.get('/books');
+    libros.value = resp.data || [];
+  } catch (err) {
+    error.value = 'Error al cargar libros';
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-    obtenerNombreAutor(autorId) {
-      const autor = this.autores.find(a => a.id === autorId)
-      return autor ? `${autor.nombre} ${autor.apellido}` : `ID: ${autorId}`
-    },
-
-    truncarTexto(texto, longitud) {
-      if (!texto) return 'Sin sinopsis'
-      return texto.length > longitud ? texto.substring(0, longitud) + '...' : texto
-    },
-
-    editarLibro(id) {
-      this.$router.push(`/libros/editar/${id}`)
-    },
-
-    async eliminarLibro(id) {
-      if (!confirm('¿Estás seguro de que deseas eliminar este libro?')) {
-        return
-      }
-
-      try {
-        await axios.delete(`/api/libros/${id}`)
-        this.obtenerLibros()
-        alert('Libro eliminado correctamente')
-      } catch (error) {
-        console.error('Error al eliminar el libro:', error)
-        alert('No se pudo eliminar el libro')
-      }
+const eliminarLibro = async (id) => {
+  if (confirm('¿Estás seguro de eliminar este libro?')) {
+    try {
+      await api.delete(`/books/delete/${id}`);
+      libros.value = libros.value.filter((l) => l.id !== id);
+    } catch (err) {
+      error.value = 'Error al eliminar el libro';
     }
   }
-}
+};
+
+onMounted(() => {
+  fetchLibros();
+});
 </script>
 
 <style scoped>
