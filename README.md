@@ -1,57 +1,50 @@
-# CrudAutoresLibros
 
-This template should help get you started developing with Vue 3 in Vite.
+# 📚 Gestión de Libros en Vue 3 + Axios
 
-## Recommended IDE Setup
+## 📄 `BooksList.vue` – Lista de Libros
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+```vue
+<template>
+  <!-- Contenido omitido para brevedad -->
+</template>
 
-## Customize configuration
+<script setup>
+// Código JavaScript del componente
+</script>
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+<style scoped>
+// Estilos CSS del componente
+</style>
 ```
 
-### Compile and Hot-Reload for Development
+---
 
-```sh
-npm run dev
+## 📝 `BooksCreate.vue` – Crear Libro
+
+```vue
+<template>
+  <!-- Contenido omitido para brevedad -->
+</template>
+
+<script setup>
+// Código JavaScript del componente
+</script>
 ```
 
-### Compile and Minify for Production
+---
 
-```sh
-npm run build
-```
+## 🛠️ `BooksEdit.vue` – Editar Libro
 
-### Run Headed Component Tests with [Cypress Component Testing](https://on.cypress.io/component)
+```vue
+<template>
+  <!-- Contenido omitido para brevedad -->
+</template>
 
-```sh
-npm run test:unit:dev # or `npm run test:unit` for headless testing
-```
+<script setup>
+// Código JavaScript del componente
+</script>
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
-
-```sh
-npm run test:e2e:dev
-```
-
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
-npm run build
-npm run test:e2e
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+<style scoped>
+// Estilos CSS del componente
+</style>
 ```
