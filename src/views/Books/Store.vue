@@ -54,7 +54,7 @@ const mensaje = ref('');
 
 const obtenerAutores = async () => {
   try {
-    const response = await api.get('/authors'); // Ajusta esta ruta si es diferente
+    const response = await api.get('/authors');
     autores.value = response.data;
   } catch (error) {
     console.error('Error al cargar autores:', error);

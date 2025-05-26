@@ -54,19 +54,16 @@ const form = ref({
   autor_id: ''
 });
 
-const autores = ref([]);  // <-- Aquí el listado de autores
+const autores = ref([]);
 
 const mensaje = ref('');
 
-// Carga libro y autores
 onMounted(async () => {
   try {
-    // Cargar libro
     const responseLibro = await api.get(`/books/${id}`);
     form.value = responseLibro.data;
 
-    // Cargar autores
-    const responseAutores = await api.get('/authors');  // Ajusta la ruta si es distinta
+    const responseAutores = await api.get('/authors');
     autores.value = responseAutores.data;
   } catch (error) {
     mensaje.value = 'Error al cargar datos';
