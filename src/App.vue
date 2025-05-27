@@ -4,7 +4,6 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <template>
   <header class="b">
-    <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg bg-light border-bottom mb-4">
       <div class="container-fluid">
         <RouterLink class="navbar-brand d-flex align-items-center" to="/">
