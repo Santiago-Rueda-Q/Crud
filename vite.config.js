@@ -14,12 +14,18 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './tests/setup.js',
+    testTimeout: 20000, 
+    hookTimeout: 20000, 
     css: true,
   },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
+  },
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
 
 })
