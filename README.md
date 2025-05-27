@@ -1,57 +1,169 @@
-# CrudAutoresLibros
+# 📚 Documentación del Frontend - Gestión de Libros y Autores (Vue 3 + Axios)
 
-This template should help get you started developing with Vue 3 in Vite.
+Este documento detalla la implementación visual (frontend) del sistema de gestión de libros y autores. Está desarrollado usando Vue 3, Axios y Vue Router. Aquí encontrarás los componentes clave con su estructura, lógica y estilos, como referencia técnica para desarrolladores.
 
-## Recommended IDE Setup
+---
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 📄 `BooksList.vue` – Lista de Libros
 
-## Customize configuration
+Muestra todos los libros registrados en una tabla, permite actualizarlos o eliminarlos y acceder al formulario de creación de nuevos libros.
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+```vue
+<template>
+  ...
+</template>
 
-## Project Setup
+<script setup>
+  import { ref, onMounted } from 'vue';
+  import api from '@/configApi/Axios.js';
 
-```sh
-npm install
+  const libros = ref([]);
+  const isLoading = ref(false);
+  const error = ref('');
+
+  const fetchLibros = async () => {
+    ...
+  };
+
+  const eliminarLibro = async (id) => {
+    ...
+  };
+
+  onMounted(() => {
+    fetchLibros();
+  });
+</script>
+
+<style scoped>
+  ...
+</style>
 ```
 
-### Compile and Hot-Reload for Development
+---
 
-```sh
-npm run dev
+## 📝 `BooksCreate.vue` – Crear Libro
+
+Formulario para registrar nuevos libros. Carga previamente la lista de autores para asociar uno al libro.
+
+```vue
+<template>
+  ...
+</template>
+
+<script setup>
+  import { ref, onMounted } from 'vue';
+  import api from '@/configApi/Axios.js';
+
+  const form = ref({ titulo: '', sinopsis: '', autor_id: '' });
+  const autores = ref([]);
+  const mensaje = ref('');
+
+  const obtenerAutores = async () => {
+    ...
+  };
+
+  const crearLibro = async () => {
+    ...
+  };
+
+  onMounted(() => {
+    obtenerAutores();
+  });
+</script>
 ```
 
-### Compile and Minify for Production
+---
 
-```sh
-npm run build
+## 🛠️ `BooksEdit.vue` – Editar Libro
+
+Formulario para editar los datos de un libro existente. Carga datos iniciales y lista de autores.
+
+```vue
+<template>
+  ...
+</template>
+
+<script setup>
+  import { ref, onMounted } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+  import api from '@/configApi/Axios.js';
+
+  const route = useRoute();
+  const router = useRouter();
+  const form = ref(null);
+  const autores = ref([]);
+  const mensaje = ref('');
+
+  const obtenerLibro = async () => {
+    ...
+  };
+
+  const obtenerAutores = async () => {
+    ...
+  };
+
+  const editarLibro = async () => {
+    ...
+  };
+
+  onMounted(() => {
+    obtenerLibro();
+    obtenerAutores();
+  });
+</script>
 ```
 
-### Run Headed Component Tests with [Cypress Component Testing](https://on.cypress.io/component)
+---
 
-```sh
-npm run test:unit:dev # or `npm run test:unit` for headless testing
+## 🔧 Configuración Axios
+
+Archivo de configuración centralizado para realizar peticiones HTTP a la API Laravel:
+
+```js
+// src/configApi/Axios.js
+import axios from 'axios';
+
+export default axios.create({
+  baseURL: 'http://localhost:8000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 ```
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+---
 
-```sh
-npm run test:e2e:dev
+## 🧩 Rutas del Frontend (Vue Router)
+
+Configuración de rutas para navegar entre los componentes:
+
+```js
+// src/router/index.js
+import { createRouter, createWebHistory } from 'vue-router';
+import BooksList from '@/views/BooksList.vue';
+import BooksCreate from '@/views/BooksCreate.vue';
+import BooksEdit from '@/views/BooksEdit.vue';
+
+const routes = [
+  { path: '/books', name: 'BooksList', component: BooksList },
+  { path: '/books/create', name: 'BooksCreate', component: BooksCreate },
+  { path: '/books/edit/:id', name: 'BooksEdit', component: BooksEdit, props: true },
+];
+
+export default createRouter({
+  history: createWebHistory(),
+  routes,
+});
 ```
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
+---
 
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
+## 🧠 Notas Finales
 
-```sh
-npm run build
-npm run test:e2e
-```
+* Este frontend está acoplado a una API RESTful desarrollada en Laravel.
+* Asegúrate de tener habilitado CORS en el backend.
+* Se recomienda agregar validaciones adicionales tanto en frontend como backend.
+* Todos los formularios usan `v-model` para enlace reactivo y `ref` para el estado.
 
-### Lint with [ESLint](https://eslint.org/)
+---
 
-```sh
-npm run lint
-```
