@@ -1,6 +1,6 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createMemoryHistory, useRouter } from 'vue-router'
-import { vi } from 'vitest'
+import { vi, expect } from 'vitest'
 import Edit from './Edit.vue'
 
 vi.mock('vue-router', async () => {
