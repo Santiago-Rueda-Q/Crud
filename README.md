@@ -11,14 +11,14 @@ Este documento detalla la implementación visual (frontend) del sistema de gesti
 Antes de ejecutar el proyecto, asegúrate de tener instalado:
 
 - **Node.js** (versión 16 o superior)
-- **npm** o **yarn** como gestor de paquetes
+- **npm** como gestor de paquetes
 - **Git** para clonar el repositorio
 
 ### 🛠️ Instalación y Configuración
 
 1. **Clonar el repositorio**
    ```bash
-   git clone <url-del-repositorio>
+   git clone [<url-del-repositorio>](https://github.com/Santiago-Rueda-Q/vue_frontend_libros_autores.git)
    cd proyecto-frontend-vue
    ```
 
@@ -26,17 +26,13 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
    ```bash
    # Usando npm
    npm install
-   
-   # O usando yarn
-   yarn install
    ```
 
 3. **Configurar variables de entorno**
    
    Crear archivo `.env` en la raíz del proyecto:
    ```env
-   VITE_API_BACKEND=http://localhost:8000/api
-   VITE_APP_NAME=Gestión de Libros
+   VITE_API_BACKEND=http://back.test/api
    ```
 
 ### ⚡ Comandos de Ejecución
@@ -45,23 +41,17 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
 ```bash
 # Iniciar servidor de desarrollo con hot-reload
 npm run dev
-# o
-yarn dev
 
-# El proyecto estará disponible en: http://localhost:5173
+# El proyecto estará disponible en: [http://localhost:5173](http://localhost:5173/)
 ```
 
 #### Modo Producción
 ```bash
 # Construir para producción
 npm run build
-# o
-yarn build
 
 # Previsualizar build de producción
 npm run preview
-# o
-yarn preview
 ```
 
 #### Otros Comandos Útiles
@@ -96,21 +86,15 @@ Las pruebas están configuradas con:
 ```bash
 # Ejecutar tests una sola vez
 npm run test
-# o
-yarn test
 
 # Ejecutar tests en modo watch (se re-ejecutan automáticamente)
 npm run test:watch
-# o
-yarn test:watch
 ```
 
 #### Tests con Cobertura
 ```bash
 # Generar reporte de cobertura
 npm run test:coverage
-# o
-yarn test:coverage
 
 # El reporte se genera en: coverage/index.html
 ```
@@ -119,13 +103,9 @@ yarn test:coverage
 ```bash
 # Ejecutar tests de un archivo específico
 npm run test Authors/Edit.test.js
-# o
-yarn test Authors/Edit.test.js
 
 # Ejecutar tests que coincidan con un patrón
 npm run test -- --grep "Authors"
-# o
-yarn test -- --grep "Authors"
 ```
 
 ### 📊 Estructura de Tests
@@ -148,7 +128,7 @@ yarn test -- --grep "Authors"
 
 ### 🎯 Ejemplo de Test
 
-```javascript
+```
 // Authors/Store.test.js
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
@@ -203,20 +183,16 @@ describe('Authors Store Component', () => {
 
 ### 📈 Debugging Tests
 
-```bash
+```
 # Ejecutar tests en modo debug
 npm run test:debug
-# o
-yarn test:debug
 
 # Ver output detallado
 npm run test -- --reporter=verbose
-# o
-yarn test -- --reporter=verbose
 ```
 
 ---
-
+# 📁 Estructura del Proyecto
 ```
 📁 Estructura del Proyecto
 └── 📁src
@@ -341,7 +317,7 @@ router.beforeEach((to, from, next) => {
 Axios es una librería HTTP cliente basada en promesas que facilita las peticiones al backend.
 
 # ⚙️ Configuración Base (configApi/Axios.js)
-```javascript
+```
 import axios from 'axios'
 
 // Instancia personalizada de Axios
@@ -461,7 +437,7 @@ Formulario para registrar nuevos libros. Carga previamente la lista de autores p
 
 Formulario para editar los datos de un libro existente. Carga datos iniciales y lista de autores.
 
-```vue
+```
 <template>
   ...
 </template>
@@ -502,16 +478,51 @@ Formulario para editar los datos de un libro existente. Carga datos iniciales y 
 
 Archivo de configuración centralizado para realizar peticiones HTTP a la API Laravel:
 
-```js
-// src/configApi/Axios.js
+```
+//VITE_API_BACKEND=http://back.test/api
+
 import axios from 'axios';
 
-export default axios.create({
-  baseURL: 'http://localhost:8000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BACKEND,
+  withCredentials: true,
 });
+
+api.defaults.xsrfCookieName = 'XSRF-TOKEN'
+api.defaults.xsrfHeaderName = 'X-XSRF-TOKEN'
+
+// Interceptor para añadir el token a las peticiones
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+// Interceptor para manejar respuestas y errores
+api.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token inválido o expirado
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
+export default api;
+
 ```
 
 ---
@@ -520,7 +531,7 @@ export default axios.create({
 
 Configuración de rutas para navegar entre los componentes:
 
-```js
+```
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
 import BooksList from '@/views/BooksList.vue';
